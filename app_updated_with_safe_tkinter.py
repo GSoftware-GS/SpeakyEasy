@@ -22,6 +22,11 @@ stop_event = threading.Event()
 audio_queue = queue.Queue()
 
 
+
+# Asegurarse de que tkinter solo se actualice desde el hilo principal
+def update_ui_from_thread_safe(text):
+    root.after(0, lambda: label.config(text=text))
+
 # Función para capturar el audio del micrófono
 def record_audio():
     print("record")

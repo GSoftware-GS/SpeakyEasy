@@ -1,0 +1,4 @@
+pyaudio
+google-cloud-speech
+google-cloud-translate==2.0.1
+tkinter

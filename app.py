@@ -58,7 +58,7 @@ def stream_generator():
 def listen_print_loop(responses, text_widget):
     print("listen_loop")
     for response in responses:
-        print(f"Response: {response}")
+        
         if stop_event.is_set():
             break
         if not response.results:
@@ -69,6 +69,7 @@ def listen_print_loop(responses, text_widget):
             continue
 
         transcript = result.alternatives[0].transcript
+        print(f"Transcript: {transcript}")
 
         # Actualizar el texto en el hilo principal usando after
         text_widget.after(0, text_widget.delete, 1.0, tk.END)
@@ -98,7 +99,6 @@ def create_gui():
 
 # Función principal para iniciar la transcripción en tiempo real
 def transcribe_streaming(text_widget):
-    print("transcribe_streaming")
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
         sample_rate_hertz=RATE,

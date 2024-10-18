@@ -18,11 +18,7 @@ translate_client = translate.Client()
 RATE = 16000  # Frecuencia de muestreo
 CHUNK = int(RATE / 10)  # 100ms por chunk
 
-# Idiomas
-source_language = "es"  # Idioma para la transcripción
-target_language = "en-US"     # Idioma para la traducción
-
-# Events
+#Events
 stop_event = threading.Event()
 
 # Cola para audio
@@ -55,7 +51,6 @@ def record_audio():
 # Función para transcribir el audio en tiempo real
 def listen_print_loop(responses):
     for response in responses:
-        
         if not response.results:
             continue
 
@@ -65,13 +60,12 @@ def listen_print_loop(responses):
 
         # Transcripción obtenida
         transcript = result.alternatives[0].transcript
-        # print(f"Transcripción ({source_language}): {transcript}")
+        print(f"Transcripción: {transcript}")
 
         # Traducción de la transcripción
-        translation = translate_client.translate(transcript, target_language=target_language)
+        translation = translate_client.translate(transcript, target_language='es')
         translated_text = translation['translatedText']
-        os.system("cls")
-        print(f"Traducción ({target_language}): {translated_text}")
+        print(f"Traducción: {translated_text}")
 
 # Función principal de reconocimiento de audio
 def recognize_streaming():
@@ -82,7 +76,7 @@ def recognize_streaming():
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
         sample_rate_hertz=RATE,
-        language_code=source_language,
+        language_code="en-US",
     )
 
     streaming_config = speech.StreamingRecognitionConfig(config=config, interim_results=True)
@@ -113,4 +107,3 @@ root.mainloop()
 stop_event.set()
 audio_thread.join()
 recognition_thread.join()
-

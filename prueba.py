@@ -22,6 +22,9 @@ CHUNK = int(RATE / 10)  # 100ms por chunk
 source_language = "es"  # Idioma para la transcripción
 target_language = "en-US"     # Idioma para la traducción
 
+transcription_history = ""
+translated_history = ""
+
 # Events
 stop_event = threading.Event()
 
@@ -54,8 +57,10 @@ def record_audio():
 
 # Función para transcribir el audio en tiempo real
 def listen_print_loop(responses):
+    global transcription_history, translated_history
+    print("listen_loop")
+    
     for response in responses:
-        
         if not response.results:
             continue
 
@@ -65,14 +70,29 @@ def listen_print_loop(responses):
 
         # Transcripción obtenida
         transcript = result.alternatives[0].transcript
-        # print(f"Transcripción ({source_language}): {transcript}")
+        is_final = result.is_final
 
-        # Traducción de la transcripción
+        # Realizar la traducción provisional
         translation = translate_client.translate(transcript, target_language=target_language)
         translated_text = translation['translatedText']
-        os.system("cls")
-        print(f"Traducción ({target_language}): {translated_text}")
+        translated_text = translated_text.replace("&#39;", "'")
 
+        if is_final:
+            # Si la transcripción es final, añadirla al historial y la traducción también
+            transcription_history += transcript + "\n"
+            translated_history += translated_text + "\n"
+
+            # Limpiar la consola y mostrar las transcripciones y traducciones finales
+            os.system("cls")
+            print(f"Transcripción (español):\n{transcription_history}")
+            print(f"Traducción ({target_language}):\n{translated_history}")
+        else:
+            # Mostrar transcripción provisional y traducción provisional en tiempo real
+            os.system("cls")
+            print(f"Traducción ({target_language}):\n{translated_history}")
+            print(f"Transcripción (en progreso): {transcript}")
+            print(f"Traducción (en progreso): {translated_text}")
+            
 # Función principal de reconocimiento de audio
 def recognize_streaming():
     audio_generator = (audio_queue.get() for _ in iter(int, 1))
